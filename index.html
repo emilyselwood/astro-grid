@@ -146,17 +146,15 @@
         .attr("fill", function(d) { return d3.rgb(0, 0, colourScale(d.Count));})
         .attr("stroke", "dark gray")
         .on("click", function(d) {
-          console.log("data/" + d.X + "/" +d.Y + ".txt");
 
           ga('send', 'event', 'grid', 'click', d.X + ":" + d.Y);
 
           d3.csv("data/" + d.X + "/" +d.Y + ".txt", function(data) {
-              console.log("result");
+
               var links = d3.select("#links");
-              console.log("links");
               var linkElements = links.selectAll("a.link")
                 .data(data);
-              console.log("data");
+
               linkElements.remove();
               linkElements.enter()
                 .append("a")
@@ -165,7 +163,6 @@
                   return "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id;
                 })
                 .on("click", function(d) { trackOutboundLink("http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id) })
-
                 .text(function(d) { return d.id; })
                 .append("br");
             });
