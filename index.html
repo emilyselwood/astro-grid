@@ -129,6 +129,9 @@
         .attr("stroke", "dark gray")
         .on("click", function(d) {
           console.log("data/" + d.X + "/" +d.Y + ".txt");
+
+          ga('send', 'event', 'grid', 'click', d.X + ":" + d.Y);
+
           d3.csv("data/" + d.X + "/" +d.Y + ".txt", function(data) {
               console.log("result");
               var links = d3.select("#links");
@@ -143,6 +146,8 @@
                 .attr("href", function(d) {
                   return "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id;
                 })
+                .on("click", function(d) { trackOutboundLink("http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id) })
+
                 .text(function(d) { return d.id; })
                 .append("br");
             });
@@ -167,6 +172,14 @@
 
     ga('create', 'UA-38378302-3', 'auto');
     ga('send', 'pageview');
+
+    var trackOutboundLink = function(url) {
+       ga('send', 'event', 'outbound', 'click', url, {'hitCallback':
+         function () {
+         document.location = url;
+         }
+       });
+    }
 
   </script>
 </body>
