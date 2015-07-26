@@ -22,7 +22,7 @@ type Dimension struct {
 /*
 NumDimentions contains the number of dimensions we are processing.
 */
-const NumDimentions = 3
+const NumDimentions = 6
 
 /*
 BuildDimensions will create the standard set of dimensions
@@ -33,6 +33,10 @@ func BuildDimensions() [NumDimentions]Dimension {
 	result[0] = buildApohelion()
 	result[1] = buildPerihelion()
 	result[2] = buildYearOfFirstObs()
+	result[3] = buildYearOfLastObs()
+	result[4] = buildOrbitalEccentricity()
+	result[5] = buildInclinationToTheEcliptic()
+
 	return result
 }
 
@@ -70,6 +74,42 @@ func buildYearOfFirstObs() Dimension {
 	result.MaxValue = 2015
 	result.GridSize = 100
 	result.Extractor = &YearOfFirstObsExtractor{1915}
+
+	return result
+}
+
+func buildYearOfLastObs() Dimension {
+	var result Dimension
+
+	result.Name = "Year-Of-Last-Obs"
+	result.MinValue = 1915
+	result.MaxValue = 2015
+	result.GridSize = 101
+	result.Extractor = &YearOfLastObsExtractor{1915}
+
+	return result
+}
+
+func buildOrbitalEccentricity() Dimension {
+	var result Dimension
+
+	result.Name = "Orbital-Eccentricity"
+	result.MinValue = 0
+	result.MaxValue = 100
+	result.GridSize = 100
+	result.Extractor = &OrbitalEccentricityExtractor{}
+
+	return result
+}
+
+func buildInclinationToTheEcliptic() Dimension {
+	var result Dimension
+
+	result.Name = "Inclination-To-The-Ecliptic"
+	result.MinValue = 0
+	result.MaxValue = 180
+	result.GridSize = 90
+	result.Extractor = &InclinationToTheEclipticExtractor{}
 
 	return result
 }

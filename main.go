@@ -135,6 +135,7 @@ func main() {
 				y := dimentions[j].Extractor.ExtractCell(result)
 				if x > 0 && y > 0 {
 					grid := resultTable[i][j].G
+					//fmt.Printf("i:%d j:%d x:%d y:%d\n", i, j, x, y)
 
 					grid[x][y].Count = grid[x][y].Count + 1
 
@@ -155,11 +156,6 @@ func main() {
 	if err != nil && err != io.EOF {
 		log.Fatal(fmt.Sprintf("error reading line %d\n", count), err)
 	}
-
-	// Now fill in the specal entries for the major planets.
-	//resultTable[10][10].Special = "Earth"
-	//resultTable[15][15].Special = "Mars"
-	//resultTable[52][52].Special = "Jupiter"
 
 	outputGrid(dimentions[:], resultTable)
 	RenderDimensions(*outputDir, dimentions[:])

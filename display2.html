@@ -33,7 +33,6 @@
       <option value="green">Green</option>
       <option value="blue">Blue</option>
     </select>
-
   </div>
   <div id="body">
     <div id="display">
@@ -52,7 +51,6 @@
       var yAxisName = ySelect.options[ySelect.selectedIndex].value;
 
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
-
       d3.json(inputValue, function(error, chartData) {
         var maxX = d3.max(chartData, function(d) { return d.x; });
         var maxY = d3.max(chartData, function(d) { return d.y; });
@@ -93,7 +91,7 @@
         if (minY < 10) {
           minY = 0;
         }
-        console.log("minX:" + minX + " minY:" + minY);
+
         var yScale = d3.scale.linear()
             .domain([minY, d3.max(chartData, function(d) { return d.sy; })])
             .range([45, height]);
@@ -164,21 +162,18 @@
 
         rectangles.remove();
 
-        rectangles.enter().append("svg:rect")
+        rectangles.enter()
+          .append("svg:rect")
           .attr("class", "rects")
           .attr("x", function(d) { return (d.x * 10) + 45; })
           .attr("y", function(d) { return (d.y * 10) + 45; })
-          .attr("width", function(d) { return 10; })
-          .attr("height", function(d) { return 10; })
+          .attr("width", 10)
+          .attr("height", 10)
           .attr("fill", function(d) { return mapColour(d.c);})
           .attr("stroke", "dark gray")
           .append("svg:title")
           .text(function(d) {
-            var result = "X: " + d.sx + " Y: " + d.sy + " Count: " +d.c;
-            if (d.s && d.s != "") {
-              result = result + " (" + d.s + ")";
-            }
-            return result;
+            return "X: " + d.sx + " Y: " + d.sy + " Count: " +d.c;
           });
 
 
@@ -186,7 +181,6 @@
     }
 
     d3.json("data/dimensions.json", function(error, dimensionData) {
-
       var xOptions = d3.select("#xAxisSelect").selectAll("option")
         .data(dimensionData)
         .enter()

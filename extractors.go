@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/wselwood/gompcreader"
 )
@@ -92,9 +93,78 @@ func (extractor *YearOfFirstObsExtractor) Extract(in *gompcreader.MinorPlanet) s
 	return fmt.Sprintf("%d", in.YearOfFirstObservation)
 }
 
+/*
+YearOfLastObsExtractor extractor for getting at the year of last observation.
+*/
+type YearOfLastObsExtractor struct {
+	minValue int64
+}
+
+/*
+ExtractCell extracts the cell number for the year of first observation.
+*/
+func (extractor *YearOfLastObsExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
+	if in.YearOfFirstObservation > extractor.minValue {
+		return int32(in.YearOfLastObservation - extractor.minValue)
+	}
+	return -1
+}
+
+/*
+Extract the value for the year of first observation.
+*/
+func (extractor *YearOfLastObsExtractor) Extract(in *gompcreader.MinorPlanet) string {
+	return fmt.Sprintf("%d", in.YearOfLastObservation)
+}
+
+/*
+OrbitalEccentricityExtractor does what it says on the tin.
+*/
+type OrbitalEccentricityExtractor struct {
+}
+
+/*
+ExtractCell for the orbital eccentricity
+*/
+func (extractor *OrbitalEccentricityExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
+	return int32(in.OrbitalEccentricity * 100)
+}
+
+/*
+Extract the orbital eccentricity
+*/
+func (extractor *OrbitalEccentricityExtractor) Extract(in *gompcreader.MinorPlanet) string {
+	return fmt.Sprintf("%f", round(in.OrbitalEccentricity, 2))
+}
+
+/*
+InclinationToTheEclipticExtractor does what it says on the tin.
+*/
+type InclinationToTheEclipticExtractor struct {
+}
+
+/*
+ExtractCell for the InclinationToTheEcliptic
+*/
+func (extractor *InclinationToTheEclipticExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
+	return int32(in.InclinationToTheEcliptic / 2)
+}
+
+/*
+Extract the InclinationToTheEcliptic
+*/
+func (extractor *InclinationToTheEclipticExtractor) Extract(in *gompcreader.MinorPlanet) string {
+	return fmt.Sprintf("%f", round(in.InclinationToTheEcliptic, 1))
+}
+
 func scaleAxis(in float64, maxValue float64, multiplier float64) int32 {
 	if in <= maxValue {
 		return int32(in * multiplier)
 	}
 	return -1
+}
+
+func round(f float64, places int) float64 {
+	shift := math.Pow(10, float64(places))
+	return math.Floor((f*shift)+.5) / shift
 }
