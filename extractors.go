@@ -134,7 +134,7 @@ func (extractor *OrbitalEccentricityExtractor) ExtractCell(in *gompcreader.Minor
 Extract the orbital eccentricity
 */
 func (extractor *OrbitalEccentricityExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%f", round(in.OrbitalEccentricity, 2))
+	return fmt.Sprintf("%2.2f", in.OrbitalEccentricity)
 }
 
 /*
@@ -154,7 +154,51 @@ func (extractor *InclinationToTheEclipticExtractor) ExtractCell(in *gompcreader.
 Extract the InclinationToTheEcliptic
 */
 func (extractor *InclinationToTheEclipticExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%f", round(in.InclinationToTheEcliptic, 1))
+	return fmt.Sprintf("%f", in.InclinationToTheEcliptic)
+}
+
+/*
+SemimajorAxisExtractor also does what it says on the tin.
+*/
+type SemimajorAxisExtractor struct {
+	maxValue   float64
+	multiplier float64
+}
+
+/*
+ExtractCell for the SemimajorAxisExtractor
+*/
+func (extractor *SemimajorAxisExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
+	return scaleAxis(in.SemimajorAxis, extractor.maxValue, extractor.multiplier)
+}
+
+/*
+Extract the SemimajorAxisExtractor
+*/
+func (extractor *SemimajorAxisExtractor) Extract(in *gompcreader.MinorPlanet) string {
+	return fmt.Sprintf("%3.1f", float64(int64(in.SemimajorAxis*extractor.multiplier))/extractor.multiplier)
+}
+
+/*
+AbsoluteMagnitudeExtractor also does what it says on the tin.
+*/
+type AbsoluteMagnitudeExtractor struct {
+	maxValue   float64
+	multiplier float64
+}
+
+/*
+ExtractCell for the InclinationToTheEcliptic
+*/
+func (extractor *AbsoluteMagnitudeExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
+	return int32(float64(int64(in.AbsoluteMagnitude*extractor.multiplier)) / extractor.multiplier)
+}
+
+/*
+Extract the InclinationToTheEcliptic
+*/
+func (extractor *AbsoluteMagnitudeExtractor) Extract(in *gompcreader.MinorPlanet) string {
+	return fmt.Sprintf("%3.1f", in.AbsoluteMagnitude)
 }
 
 func scaleAxis(in float64, maxValue float64, multiplier float64) int32 {

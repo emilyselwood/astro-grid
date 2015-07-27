@@ -22,7 +22,7 @@ type Dimension struct {
 /*
 NumDimentions contains the number of dimensions we are processing.
 */
-const NumDimentions = 6
+const NumDimentions = 8
 
 /*
 BuildDimensions will create the standard set of dimensions
@@ -36,6 +36,8 @@ func BuildDimensions() [NumDimentions]Dimension {
 	result[3] = buildYearOfLastObs()
 	result[4] = buildOrbitalEccentricity()
 	result[5] = buildInclinationToTheEcliptic()
+	result[6] = buildSemiMajorAxis()
+	result[7] = buildAbsoluteMagnitude()
 
 	return result
 }
@@ -111,6 +113,31 @@ func buildInclinationToTheEcliptic() Dimension {
 	result.GridSize = 90
 	result.Extractor = &InclinationToTheEclipticExtractor{}
 
+	return result
+}
+
+func buildSemiMajorAxis() Dimension {
+	var result Dimension
+
+	result.Name = "Semi-Major-Axis"
+	result.MinValue = 0
+	result.MaxValue = 10
+	result.GridSize = 100
+
+	result.Extractor = &SemimajorAxisExtractor{10, 10.0}
+
+	return result
+}
+
+func buildAbsoluteMagnitude() Dimension {
+	var result Dimension
+
+	result.Name = "Absolute-Magnitude"
+	result.MinValue = -2
+	result.MaxValue = 35
+	result.GridSize = 100
+
+	result.Extractor = &AbsoluteMagnitudeExtractor{35, 10.0}
 	return result
 }
 

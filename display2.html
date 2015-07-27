@@ -116,7 +116,7 @@
               "shape-rendering" : "crispEdges",
               "stroke" : "white",
               "stroke-width" : "1px"
-          })
+          });
         yaxis.enter().append("text")
           .attr("class", "ymark")
           .attr("text-anchor", "middle")
@@ -173,9 +173,8 @@
           .attr("stroke", "dark gray")
           .append("svg:title")
           .text(function(d) {
-            return "X: " + d.sx + " Y: " + d.sy + " Count: " +d.c;
+            return xAxisName + ": " + d.sx + " " + yAxisName + ": " + d.sy + " Count: " +d.c;
           });
-
 
       })
     }
