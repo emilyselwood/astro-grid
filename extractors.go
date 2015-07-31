@@ -80,7 +80,7 @@ type YearOfFirstObsExtractor struct {
 ExtractCell extracts the cell number for the year of first observation.
 */
 func (extractor *YearOfFirstObsExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	if in.YearOfFirstObservation > extractor.minValue {
+	if in.YearOfFirstObservation >= extractor.minValue {
 		return int32(in.YearOfFirstObservation - extractor.minValue)
 	}
 	return -1
@@ -104,7 +104,7 @@ type YearOfLastObsExtractor struct {
 ExtractCell extracts the cell number for the year of first observation.
 */
 func (extractor *YearOfLastObsExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	if in.YearOfFirstObservation > extractor.minValue {
+	if in.YearOfFirstObservation >= extractor.minValue {
 		return int32(in.YearOfLastObservation - extractor.minValue)
 	}
 	return -1
