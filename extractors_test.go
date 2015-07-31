@@ -89,7 +89,25 @@ func TestYearOfFirstObsExtractor(t *testing.T) {
 	for _, tt := range yearOfFirstObsTestCases {
 		var input gompcreader.MinorPlanet
 		input.YearOfFirstObservation = tt.in
-		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell")
-		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message")
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %d %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %d %s", tt.in, tt.out)
+	}
+}
+
+var yearOfLastObsTestCases = []yearTestCase{
+	{2015, "2015", 100},
+	{2000, "2000", 85},
+	{1916, "1916", 1},
+	{1915, "1915", 0},
+	{1914, "1914", -1},
+}
+
+func TestYearOfLastObsExtractor(t *testing.T) {
+	extractor := YearOfLastObsExtractor{1915}
+	for _, tt := range yearOfLastObsTestCases {
+		var input gompcreader.MinorPlanet
+		input.YearOfLastObservation = tt.in
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %d %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %d %s", tt.in, tt.out)
 	}
 }
