@@ -134,7 +134,7 @@ func (extractor *OrbitalEccentricityExtractor) ExtractCell(in *gompcreader.Minor
 Extract the orbital eccentricity
 */
 func (extractor *OrbitalEccentricityExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%2.2f", in.OrbitalEccentricity)
+	return fmt.Sprintf("%3.2f", float64(int64(in.OrbitalEccentricity*100.0))/100.0)
 }
 
 /*

@@ -111,3 +111,27 @@ func TestYearOfLastObsExtractor(t *testing.T) {
 		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %d %s", tt.in, tt.out)
 	}
 }
+
+type floatTestCase struct {
+	in      float64
+	out     string
+	outCell int
+}
+
+var orbitalEccentricityTestCases = []floatTestCase{
+	{0.99, "0.99", 99},
+	{0.554, "0.55", 55},
+	{0.555, "0.55", 55},
+	{0.0, "0.00", 0},
+}
+
+func TestOrbitalEccentricityExtractor(t *testing.T) {
+	extractor := OrbitalEccentricityExtractor{}
+	for _, tt := range orbitalEccentricityTestCases {
+		var input gompcreader.MinorPlanet
+		input.OrbitalEccentricity = tt.in
+
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %f %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %f %s", tt.in, tt.out)
+	}
+}
