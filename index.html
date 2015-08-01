@@ -204,11 +204,7 @@
       d3.select("#colourSelect").on("change", onAxisChange);
 
       if (window.location.hash) {
-        // Fragment exists
-        if (window.location.hash.indexOf("/") === -1) {
-          onAxisChange();
-        } else {
-
+        if (window.location.hash.indexOf("/") !== -1) {
           var parts = window.location.hash.split("/")
 
           document.getElementById('xAxisSelect').value = parts[0].substring(1)
@@ -218,9 +214,9 @@
             document.getElementById('colourSelect').value = parts[2]
           }
         }
-      } else {
-        onAxisChange();
       }
+      onAxisChange();
+
     });
   </script>
 </body>
