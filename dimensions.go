@@ -134,10 +134,10 @@ func buildAbsoluteMagnitude() Dimension {
 
 	result.Name = "Absolute-Magnitude"
 	result.MinValue = -2
-	result.MaxValue = 35
+	result.MaxValue = 28
 	result.GridSize = 100
 
-	result.Extractor = &AbsoluteMagnitudeExtractor{35, 10.0, 1.5, 3}
+	result.Extractor = &AbsoluteMagnitudeExtractor{28, 10.0, 1.5, 3}
 	return result
 }
 

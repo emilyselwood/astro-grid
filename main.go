@@ -135,7 +135,8 @@ func main() {
 				y := dimentions[j].Extractor.ExtractCell(result)
 				if x > 0 && y > 0 {
 					grid := resultTable[i][j].G
-					//fmt.Printf("i:%d j:%d x:%d y:%d\n", i, j, x, y)
+
+					//fmt.Printf("i:%2d, j:%2d, x:%3d, y:%3d, c:%d\n", i, j, x, y, count)
 
 					grid[x][y].Count = grid[x][y].Count + 1
 

@@ -193,7 +193,7 @@ type AbsoluteMagnitudeExtractor struct {
 ExtractCell for the InclinationToTheEcliptic
 */
 func (extractor *AbsoluteMagnitudeExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	if extractor.maxValue >= in.AbsoluteMagnitude {
+	if in.AbsoluteMagnitude <= extractor.maxValue {
 		return int32((in.AbsoluteMagnitude+extractor.offset)*extractor.multiplier) / extractor.division
 	}
 	return -1
