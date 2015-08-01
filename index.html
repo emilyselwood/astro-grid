@@ -47,11 +47,13 @@
     var onAxisChange = function() {
       var xSelect = document.getElementById("xAxisSelect");
       var ySelect = document.getElementById("yAxisSelect");
+      var colourSelect = document.getElementById("colourSelect");
 
       var xAxisName = xSelect.options[xSelect.selectedIndex].value;
       var yAxisName = ySelect.options[ySelect.selectedIndex].value;
+      var colourValue = colourSelect.options[colourSelect.selectedIndex].value;
 
-      window.location.hash = xAxisName + "/" + yAxisName
+      window.location.hash = xAxisName + "/" + yAxisName + "/" + colourValue;
 
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
       d3.json(inputValue, function(error, chartData) {
@@ -201,7 +203,23 @@
       d3.select("#yAxisSelect").on("change", onAxisChange);
       d3.select("#colourSelect").on("change", onAxisChange);
 
-      onAxisChange();
+      if (window.location.hash) {
+        // Fragment exists
+        if (window.location.hash.indexOf("/") === -1) {
+          onAxisChange();
+        } else {
+          var parts = window.location.hash.split("/")
+
+          document.getElementById('xAxisSelect').value = parts[0]
+          document.getElementById('yAxisSelect').value = parts[1]
+
+          if (parts[2]) {
+            document.getElementById('colourSelect').value = parts[2]
+          }
+        }
+      } else {
+        onAxisChange();
+      }
     });
   </script>
 </body>
