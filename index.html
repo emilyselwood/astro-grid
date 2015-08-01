@@ -51,6 +51,8 @@
       var xAxisName = xSelect.options[xSelect.selectedIndex].value;
       var yAxisName = ySelect.options[ySelect.selectedIndex].value;
 
+      window.location.hash = xAxisName + "/" + yAxisName
+
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
       d3.json(inputValue, function(error, chartData) {
         var maxX = d3.max(chartData, function(d) { return d.x; });
