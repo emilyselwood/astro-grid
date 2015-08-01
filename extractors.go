@@ -154,7 +154,7 @@ func (extractor *InclinationToTheEclipticExtractor) ExtractCell(in *gompcreader.
 Extract the InclinationToTheEcliptic
 */
 func (extractor *InclinationToTheEclipticExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%f", in.InclinationToTheEcliptic)
+	return fmt.Sprintf("%3.1f", float64(int64(in.InclinationToTheEcliptic/2))*2)
 }
 
 /*
@@ -185,20 +185,25 @@ AbsoluteMagnitudeExtractor also does what it says on the tin.
 type AbsoluteMagnitudeExtractor struct {
 	maxValue   float64
 	multiplier float64
+	offset     float64
+	division   int32
 }
 
 /*
 ExtractCell for the InclinationToTheEcliptic
 */
 func (extractor *AbsoluteMagnitudeExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	return int32(float64(int64(in.AbsoluteMagnitude*extractor.multiplier)) / extractor.multiplier)
+	if extractor.maxValue >= in.AbsoluteMagnitude {
+		return int32((in.AbsoluteMagnitude+extractor.offset)*extractor.multiplier) / extractor.division
+	}
+	return -1
 }
 
 /*
 Extract the InclinationToTheEcliptic
 */
 func (extractor *AbsoluteMagnitudeExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%3.1f", in.AbsoluteMagnitude)
+	return fmt.Sprintf("%3.1f", float64(int64(in.AbsoluteMagnitude*extractor.multiplier))/extractor.multiplier)
 }
 
 func scaleAxis(in float64, maxValue float64, multiplier float64) int32 {

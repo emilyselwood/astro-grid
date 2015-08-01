@@ -135,3 +135,58 @@ func TestOrbitalEccentricityExtractor(t *testing.T) {
 		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %f %s", tt.in, tt.out)
 	}
 }
+
+//InclinationToTheEclipticExtractor
+var inclinationTestCases = []floatTestCase{
+	{12.0, "12.0", 6},
+	{45.4, "44.0", 22},
+	{45.6, "44.0", 22},
+	{44.4, "44.0", 22},
+	{43.6, "42.0", 21},
+}
+
+func TestInclinationToTheEclipticExtractor(t *testing.T) {
+	extractor := InclinationToTheEclipticExtractor{}
+	for _, tt := range inclinationTestCases {
+		var input gompcreader.MinorPlanet
+		input.InclinationToTheEcliptic = tt.in
+
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %f %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %f %s", tt.in, tt.out)
+	}
+}
+
+//SemimajorAxisExtractor
+var semimajorAxisTestCases = []floatTestCase{
+	{12.34, "12.3", -1},
+	{5.34, "5.3", 53},
+}
+
+func TestSemimajorAxisExtractor(t *testing.T) {
+	extractor := SemimajorAxisExtractor{10.0, 10}
+	for _, tt := range semimajorAxisTestCases {
+		var input gompcreader.MinorPlanet
+		input.SemimajorAxis = tt.in
+
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %f %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %f %s", tt.in, tt.out)
+	}
+}
+
+//AbsoluteMagnitudeExtractor
+var absoluteMagnitudeTestCases = []floatTestCase{
+	{-1.123, "-1.1", 1},
+	{1.43, "1.4", 9},
+	{14.5, "14.5", 53},
+}
+
+func TestAbsoluteMagnitudeExtractor(t *testing.T) {
+	extractor := AbsoluteMagnitudeExtractor{30, 10.0, 1.5, 3}
+	for _, tt := range absoluteMagnitudeTestCases {
+		var input gompcreader.MinorPlanet
+		input.AbsoluteMagnitude = tt.in
+
+		assert.Equal(t, tt.outCell, extractor.ExtractCell(&input), "incorrect cell %f %d", tt.in, tt.outCell)
+		assert.Equal(t, tt.out, extractor.Extract(&input), "incorrect message %f %s", tt.in, tt.out)
+	}
+}
