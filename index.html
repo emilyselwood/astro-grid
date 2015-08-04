@@ -83,22 +83,47 @@
           }
         };
 
-        var minX = d3.min(chartData, function(d) { return d.sx; });
-        if (minX < 10) {
+        var minX = d3.min(chartData, function(d) {
+          if (d.sx.contains("-")) {
+            return parseFloat(d.sx);
+          }
+          return d.sx;
+        });
+        if (minX < 10 && minX > 0) {
           minX = 0;
         }
 
+        var maxSX = d3.max(chartData, function(d) {
+          if (d.sx.contains("-") || d.sx.contains(".")) {
+            return parseFloat(d.sx);
+          }
+          return d.sx;
+        });
+
         var xScale = d3.scale.linear()
-          .domain([minX, d3.max(chartData, function(d) { return d.sx; })])
+          .domain([minX, maxSX])
           .range([45, width]);
 
-        var minY = d3.min(chartData, function(d) { return d.sy; });
-        if (minY < 10) {
+        var minY = d3.min(chartData, function(d) {
+          if (d.sy.contains("-")) {
+            return parseFloat(d.sy);
+          }
+          return d.sy;
+        });
+
+        if (minY < 10.0 && minY > 0.0) {
           minY = 0;
         }
 
+        var maxSY = d3.max(chartData, function(d) {
+          if (d.sy.contains("-") || d.sy.contains(".")) {
+            return parseFloat(d.sy);
+          }
+          return d.sy;
+        });
+
         var yScale = d3.scale.linear()
-            .domain([minY, d3.max(chartData, function(d) { return d.sy; })])
+            .domain([minY, maxSY])
             .range([45, height]);
 
         d3.select("#display").select("svg").remove();
