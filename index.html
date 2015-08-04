@@ -66,7 +66,7 @@
 
         var colourScale = d3.scale.log()
           .domain([1,maxCount])
-          .range([0,255]);
+          .range([1,255]);
 
         var mapColour = function(value) {
           var colourSelect = document.getElementById("colourSelect");
@@ -79,7 +79,8 @@
           } else if (colourEntry == "blue") {
             return d3.rgb(0, 0, colourScale(value));
           } else {
-            return d3.rgb(colourScale(value), colourScale(value), colourScale(value));
+            var colour = colourScale(value);
+            return d3.rgb(colour, colour, colour);
           }
         };
 
