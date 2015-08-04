@@ -24,6 +24,7 @@ const gridSize int = int(maxDistance * 10)
 
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputDir = flag.String("out", "", "the output path to write the structure")
+var debugMode = flag.Bool("debug", false, "add flag if you want extra debug logging. This has a big performance impact.")
 
 func outputGrid(dimentions []Dimension, resultTable [][]Grid) {
 	for i := 0; i < NumDimentions; i++ {
@@ -135,9 +136,9 @@ func main() {
 				y := dimentions[j].Extractor.ExtractCell(result)
 				if x > 0 && y > 0 {
 					grid := resultTable[i][j].G
-
-					//fmt.Printf("i:%2d, j:%2d, x:%3d, y:%3d, c:%d\n", i, j, x, y, count)
-
+					if *debugMode {
+						fmt.Printf("i:%2d, j:%2d, x:%3d, y:%3d, c:%d\n", i, j, x, y, count)
+					}
 					grid[x][y].Count = grid[x][y].Count + 1
 
 					if grid[x][y].X == 0 {
