@@ -59,6 +59,7 @@
       var dimXMaxValue = xSelect.options[xSelect.selectedIndex].__data__.max;
       var dimYMinValue = ySelect.options[ySelect.selectedIndex].__data__.min;
       var dimYMaxValue = ySelect.options[ySelect.selectedIndex].__data__.max;
+      console.log("x: " + dimXMinValue + ":" + dimXMaxValue + " y: " + dimYMinValue + ":" + dimYMaxValue)
 
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
       d3.json(inputValue, function(error, chartData) {
