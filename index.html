@@ -55,6 +55,11 @@
 
       window.location.hash = xAxisName + "/" + yAxisName + "/" + colourValue;
 
+      var dimXMinValue = xSelect.options[xSelect.selectedIndex].__data__.min;
+      var dimXMaxValue = xSelect.options[xSelect.selectedIndex].__data__.max;
+      var dimYMinValue = ySelect.options[ySelect.selectedIndex].__data__.min;
+      var dimYMaxValue = ySelect.options[ySelect.selectedIndex].__data__.max;
+
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
       d3.json(inputValue, function(error, chartData) {
         var maxX = d3.max(chartData, function(d) { return d.x; });
@@ -84,47 +89,12 @@
           }
         };
 
-        var minX = d3.min(chartData, function(d) {
-          if (d.sx.contains("-")) {
-            return parseFloat(d.sx);
-          }
-          return d.sx;
-        });
-        if (minX < 10 && minX > 0) {
-          minX = 0;
-        }
-
-        var maxSX = d3.max(chartData, function(d) {
-          if (d.sx.contains("-") || d.sx.contains(".")) {
-            return parseFloat(d.sx);
-          }
-          return d.sx;
-        });
-
         var xScale = d3.scale.linear()
-          .domain([minX, maxSX])
+          .domain([dimXMinValue, dimXMaxValue])
           .range([45, width]);
 
-        var minY = d3.min(chartData, function(d) {
-          if (d.sy.contains("-")) {
-            return parseFloat(d.sy);
-          }
-          return d.sy;
-        });
-
-        if (minY < 10.0 && minY > 0.0) {
-          minY = 0;
-        }
-
-        var maxSY = d3.max(chartData, function(d) {
-          if (d.sy.contains("-") || d.sy.contains(".")) {
-            return parseFloat(d.sy);
-          }
-          return d.sy;
-        });
-
         var yScale = d3.scale.linear()
-            .domain([minY, maxSY])
+            .domain([dimYMinValue, dimYMaxValue])
             .range([45, height]);
 
         d3.select("#display").select("svg").remove();
@@ -216,6 +186,8 @@
         .enter()
         .append("option")
         .attr("value", function(d) { return d.n })
+        .attr("minValue", function(d) { return d.min})
+        .attr("maxValue", function(d) { return d.max})
         .text(function(d) { return d.n });
 
       var yOptions = d3.select("#yAxisSelect").selectAll("option")
@@ -223,6 +195,8 @@
         .enter()
         .append("option")
         .attr("value", function(d) { return d.n })
+        .attr("minValue", function(d) { return d.min})
+        .attr("maxValue", function(d) { return d.max})
         .text(function(d) { return d.n });
 
       d3.select("#xAxisSelect").on("change", onAxisChange);
