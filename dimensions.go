@@ -12,8 +12,8 @@ Dimension defines an axis on the result
 */
 type Dimension struct {
 	Name        string         `json:"n"`
-	MinValue    int            `json:"min"`
-	MaxValue    int            `json:"max"`
+	MinValue    float64        `json:"min"`
+	MaxValue    float64        `json:"max"`
 	GridSize    int            `json:"grid"`
 	Description string         `json:"desc"`
 	Extractor   ValueExtractor `json:"-"`
@@ -45,12 +45,12 @@ func BuildDimensions() [NumDimentions]Dimension {
 func buildApohelion() Dimension {
 	var result Dimension
 
-	result.Name = "Apohelion"
+	result.Name = "Aphelion"
 	result.MinValue = 0
-	result.MaxValue = 6
-	result.GridSize = 60
+	result.MaxValue = 10
+	result.GridSize = 100
 
-	result.Extractor = &ApohelionExtractor{6, 10.0}
+	result.Extractor = &ApohelionExtractor{10, 10.0}
 
 	return result
 }
@@ -60,10 +60,10 @@ func buildPerihelion() Dimension {
 
 	result.Name = "Perihelion"
 	result.MinValue = 0
-	result.MaxValue = 6
-	result.GridSize = 60
+	result.MaxValue = 10
+	result.GridSize = 100
 
-	result.Extractor = &PerihelionExtractor{6, 10.0}
+	result.Extractor = &PerihelionExtractor{10, 10.0}
 
 	return result
 }
@@ -135,9 +135,9 @@ func buildAbsoluteMagnitude() Dimension {
 	result.Name = "Absolute-Magnitude"
 	result.MinValue = -2
 	result.MaxValue = 28
-	result.GridSize = 100
+	result.GridSize = 60
 
-	result.Extractor = &AbsoluteMagnitudeExtractor{28, 10.0, 1.5, 3}
+	result.Extractor = &AbsoluteMagnitudeExtractor{28, 10.0, 1, 5}
 	return result
 }
 

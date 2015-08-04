@@ -190,20 +190,20 @@ type AbsoluteMagnitudeExtractor struct {
 }
 
 /*
-ExtractCell for the InclinationToTheEcliptic
+ExtractCell for the AbsoluteMagnitude
 */
 func (extractor *AbsoluteMagnitudeExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	if in.AbsoluteMagnitude <= extractor.maxValue {
+	if in.AbsoluteMagnitude+extractor.offset < extractor.maxValue {
 		return int32((in.AbsoluteMagnitude+extractor.offset)*extractor.multiplier) / extractor.division
 	}
 	return -1
 }
 
 /*
-Extract the InclinationToTheEcliptic
+Extract the AbsoluteMagnitude
 */
 func (extractor *AbsoluteMagnitudeExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%3.1f", float64(int64(in.AbsoluteMagnitude*extractor.multiplier))/extractor.multiplier)
+	return fmt.Sprintf("%3.1f", float64(int64(in.AbsoluteMagnitude*2.0))/2.0)
 }
 
 func scaleAxis(in float64, maxValue float64, multiplier float64) int32 {
