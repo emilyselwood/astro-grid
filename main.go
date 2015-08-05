@@ -1,13 +1,9 @@
 package main
 
 /*
-TODO: output directory
-TODO: log entries per bucket
-TODO: build Folder structure for data.
 TODO: html display of data.
 TODO: Setup scripts
 TODO: README.md
-TODO: LICENCE.md
 TODO: Document.
 TODO: Blog post
 */
@@ -26,82 +22,52 @@ import (
 const maxDistance = 6.0
 const gridSize int = int(maxDistance * 10)
 
-/*
-GridEntry is a cell in the table. This will contain the cords and the values for the cell.
-*/
-type GridEntry struct {
-	X       int
-	Y       int
-	StartX  float64
-	EndX    float64
-	StartY  float64
-	EndY    float64
-	Count   int32
-	Special string
-}
-
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputDir = flag.String("out", "", "the output path to write the structure")
+var debugMode = flag.Bool("debug", false, "add flag if you want extra debug logging. This has a big performance impact.")
 
-func newGrid() *[gridSize][gridSize]GridEntry {
-	var resultTable [gridSize][gridSize]GridEntry
-	for x := 0; x < gridSize; x++ {
-		for y := 0; y < gridSize; y++ {
-			resultTable[x][y].X = x
-			resultTable[x][y].Y = y
+func outputGrid(dimentions []Dimension, resultTable [][]Grid) {
+	for i := 0; i < NumDimentions; i++ {
+		for j := 0; j < NumDimentions; j++ {
+			path := fmt.Sprintf("%s/%s/%s/", *outputDir, dimentions[i].Name, dimentions[j].Name)
+			os.MkdirAll(path, 0777)
 
-			resultTable[x][y].StartX = float64(x) / 10.0
-			resultTable[x][y].EndX = float64(x+1) / 10.0
+			f, err := os.Create(fmt.Sprintf("%s/data.json", path))
+			if err != nil {
+				log.Fatal("Error opening datafile", err)
+			}
+			defer f.Close()
+			f.WriteString("[")
+			first := true
 
-			resultTable[x][y].StartY = float64(y) / 10.0
-			resultTable[x][y].EndY = float64(y+1) / 10.0
+			var table = resultTable[i][j].G
 
-			resultTable[x][y].Count = -1
-			resultTable[x][y].Special = ""
+			for x := 0; x < resultTable[i][j].SizeX; x++ {
+				for y := 0; y < resultTable[i][j].SizeY; y++ {
+					entry := table[x][y]
+					if entry.Count > 0 || entry.Special != "" {
+						if first {
+							first = false
+						} else {
+							f.WriteString(",\n")
+						}
 
-		}
-	}
-
-	return &resultTable
-}
-
-func scaleAxis(in float64) int32 {
-	if in <= maxDistance {
-		return int32(in * 10.0)
-	}
-	return int32(in) + int32(gridSize)
-}
-
-func outputGrid(resultTable *[gridSize][gridSize]GridEntry) {
-	f, err := os.Create(*outputDir + "/data.json")
-	if err != nil {
-		log.Fatal("Error opening datafile", err)
-	}
-	defer f.Close()
-	f.WriteString("[")
-	first := true
-	for x := 0; x < gridSize; x++ {
-		for y := 0; y < gridSize; y++ {
-
-			if resultTable[x][y].Count > -1 || resultTable[x][y].Special != "" {
-				if first {
-					first = false
-				} else {
-					f.WriteString(",\n")
-				}
-
-				entry := resultTable[x][y]
-
-				js, e := json.Marshal(entry)
-				if e == nil {
-					f.WriteString(fmt.Sprintf("%s", js))
-				} else {
-					log.Fatal("error json marshal", e)
+						js, e := json.Marshal(entry)
+						if e == nil {
+							f.WriteString(fmt.Sprintf("%s", js))
+						} else {
+							log.Fatal("error json marshal", e)
+						}
+					}
 				}
 			}
+			f.WriteString("]")
 		}
 	}
-	f.WriteString("]")
+}
+
+func createPathIfNeeded(path string) {
+	os.MkdirAll(path, 0777)
 }
 
 func openOrCreateFile(path string) (*os.File, error) {
@@ -125,27 +91,6 @@ func pathIsDir(path string) (bool, error) {
 		return false, err
 	}
 	return pathStat.IsDir(), err
-}
-
-func addToFile(x int32, y int32, id string) error {
-	path := fmt.Sprintf("%s/%d", *outputDir, x)
-	exists, err := pathIsDir(path)
-	if err != nil {
-		return err
-	} else if !exists {
-		os.Mkdir(path, 0777)
-	}
-	// horribly inefficent should keep a cache of open files but its not a problem
-	// given the size of the data we are working with.
-	f, err := openOrCreateFile(fmt.Sprintf("%s/%d.txt", path, y))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	f.WriteString(id + "\n")
-
-	return nil
 }
 
 func main() {
@@ -173,31 +118,36 @@ func main() {
 	}
 	defer mpcReader.Close()
 
+	var dimentions = BuildDimensions()
+	var resultTable = BuildResultsGrid(dimentions[:])
+
 	var count int64
 
-	var resultTable = newGrid()
+	//var resultTable = newGrid()
 
 	result, err := mpcReader.ReadEntry()
 
 	for err == nil {
 
-		CS := result.SemimajorAxis * result.OrbitalEccentricity
+		for i := 0; i < NumDimentions; i++ {
+			for j := 0; j < NumDimentions; j++ {
 
-		perihelion := result.SemimajorAxis - CS
-		apohelion := result.SemimajorAxis + CS
+				x := dimentions[i].Extractor.ExtractCell(result)
+				y := dimentions[j].Extractor.ExtractCell(result)
+				if x > 0 && y > 0 {
+					grid := resultTable[i][j].G
+					if *debugMode {
+						fmt.Printf("i:%2d, j:%2d, x:%3d, y:%3d, c:%d\n", i, j, x, y, count)
+					}
+					grid[x][y].Count = grid[x][y].Count + 1
 
-		x := scaleAxis(perihelion)
-		y := scaleAxis(apohelion)
-
-		if x < int32(gridSize) && y < int32(gridSize) {
-			if resultTable[x][y].Count == -1 {
-				resultTable[x][y].Count = 0
-			}
-			resultTable[x][y].Count = resultTable[x][y].Count + 1
-
-			e := addToFile(x, y, result.ID)
-			if e != nil {
-				log.Fatal(fmt.Sprintf("error updating for %d:%d with id: %s", x, y, result.ID), e)
+					if grid[x][y].X == 0 {
+						grid[x][y].X = int(x)
+						grid[x][y].Y = int(y)
+						grid[x][y].StartX = dimentions[i].Extractor.Extract(result)
+						grid[x][y].StartY = dimentions[j].Extractor.Extract(result)
+					}
+				}
 			}
 		}
 
@@ -209,11 +159,6 @@ func main() {
 		log.Fatal(fmt.Sprintf("error reading line %d\n", count), err)
 	}
 
-	// Now fill in the specal entries for the major planets.
-	resultTable[10][10].Special = "Earth"
-	resultTable[15][15].Special = "Mars"
-	resultTable[52][52].Special = "Jupiter"
-
-	outputGrid(resultTable)
-
+	outputGrid(dimentions[:], resultTable)
+	RenderDimensions(*outputDir, dimentions[:])
 }

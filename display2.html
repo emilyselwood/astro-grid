@@ -13,10 +13,6 @@
       color: white;
     }
 
-    #body {
-      width: 100%;
-    }
-
     #display {
       width:650;
       height:650;
@@ -25,13 +21,6 @@
 
     #links {
       float:right;
-    }
-
-    .footer {
-      float:left;
-      width:100%;
-      margin-top: 10px;
-      font-size: 10px;
     }
   </style>
 </head>
@@ -52,28 +41,15 @@
     <div id="links">
     </div>
   </div>
-  <div class="footer">
-    Data created from <a href="http://minorplanetcenter.net/">Minor Planet Centre</a> Orbit files. Avaible <a href="http://minorplanetcenter.net/iau/MPCORB.html">here</a><br>
-    Processed by Wil Selwood using code avaible on <a href="https://github.com/wselwood/astro-grid">github</a>
-  </div>
 
   <script>
 
     var onAxisChange = function() {
       var xSelect = document.getElementById("xAxisSelect");
       var ySelect = document.getElementById("yAxisSelect");
-      var colourSelect = document.getElementById("colourSelect");
 
       var xAxisName = xSelect.options[xSelect.selectedIndex].value;
       var yAxisName = ySelect.options[ySelect.selectedIndex].value;
-      var colourValue = colourSelect.options[colourSelect.selectedIndex].value;
-
-      window.location.hash = xAxisName + "/" + yAxisName + "/" + colourValue;
-
-      var dimXMinValue = xSelect.options[xSelect.selectedIndex].__data__.min;
-      var dimXMaxValue = xSelect.options[xSelect.selectedIndex].__data__.max;
-      var dimYMinValue = ySelect.options[ySelect.selectedIndex].__data__.min;
-      var dimYMaxValue = ySelect.options[ySelect.selectedIndex].__data__.max;
 
       var inputValue = "data/" + xAxisName + "/" + yAxisName + "/data.json"
       d3.json(inputValue, function(error, chartData) {
@@ -86,7 +62,7 @@
 
         var colourScale = d3.scale.log()
           .domain([1,maxCount])
-          .range([1,255]);
+          .range([0,255]);
 
         var mapColour = function(value) {
           var colourSelect = document.getElementById("colourSelect");
@@ -99,17 +75,26 @@
           } else if (colourEntry == "blue") {
             return d3.rgb(0, 0, colourScale(value));
           } else {
-            var colour = colourScale(value);
-            return d3.rgb(colour, colour, colour);
+            return d3.rgb(colourScale(value), colourScale(value), colourScale(value));
           }
         };
 
+        var minX = d3.min(chartData, function(d) { return d.sx; });
+        if (minX < 10) {
+          minX = 0;
+        }
+
         var xScale = d3.scale.linear()
-          .domain([dimXMinValue, dimXMaxValue])
+          .domain([minX, d3.max(chartData, function(d) { return d.sx; })])
           .range([45, width]);
 
+        var minY = d3.min(chartData, function(d) { return d.sy; });
+        if (minY < 10) {
+          minY = 0;
+        }
+
         var yScale = d3.scale.linear()
-            .domain([dimYMinValue, dimYMaxValue])
+            .domain([minY, d3.max(chartData, function(d) { return d.sy; })])
             .range([45, height]);
 
         d3.select("#display").select("svg").remove();
@@ -214,18 +199,6 @@
       d3.select("#yAxisSelect").on("change", onAxisChange);
       d3.select("#colourSelect").on("change", onAxisChange);
 
-      if (window.location.hash) {
-        if (window.location.hash.indexOf("/") !== -1) {
-          var parts = window.location.hash.split("/")
-
-          document.getElementById('xAxisSelect').value = parts[0].substring(1)
-          document.getElementById('yAxisSelect').value = parts[1]
-
-          if (parts[2]) {
-            document.getElementById('colourSelect').value = parts[2]
-          }
-        }
-      }
       onAxisChange();
     });
   </script>
