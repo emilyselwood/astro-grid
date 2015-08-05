@@ -175,8 +175,8 @@ func TestSemimajorAxisExtractor(t *testing.T) {
 
 //AbsoluteMagnitudeExtractor
 var absoluteMagnitudeTestCases = []floatTestCase{
-	{-1.123, "-1.1", 1},
-	{1.43, "1.4", 9},
+	{-1.123, "-1.0", 1},
+	{1.43, "1.0", 9},
 	{14.5, "14.5", 53},
 }
 
