@@ -1,13 +1,5 @@
 package main
 
-/*
-TODO: html display of data.
-TODO: Setup scripts
-TODO: README.md
-TODO: Document.
-TODO: Blog post
-*/
-
 import (
 	"encoding/json"
 	"flag"
