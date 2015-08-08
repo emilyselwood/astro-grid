@@ -15,6 +15,7 @@ type Dimension struct {
 	MinValue    float64        `json:"min"`
 	MaxValue    float64        `json:"max"`
 	GridSize    int            `json:"grid"`
+	StepSize    float64        `json:"step"`
 	Description string         `json:"desc"`
 	Extractor   ValueExtractor `json:"-"`
 }
@@ -49,6 +50,7 @@ func buildApohelion() Dimension {
 	result.MinValue = 0
 	result.MaxValue = 10
 	result.GridSize = 100
+	result.StepSize = 0.1
 
 	result.Extractor = &ApohelionExtractor{10, 10.0}
 
@@ -62,6 +64,7 @@ func buildPerihelion() Dimension {
 	result.MinValue = 0
 	result.MaxValue = 10
 	result.GridSize = 100
+	result.StepSize = 0.1
 
 	result.Extractor = &PerihelionExtractor{10, 10.0}
 
@@ -75,6 +78,7 @@ func buildYearOfFirstObs() Dimension {
 	result.MinValue = 1915
 	result.MaxValue = 2015
 	result.GridSize = 100
+	result.StepSize = 1.0
 	result.Extractor = &YearOfFirstObsExtractor{1915}
 
 	return result
@@ -87,6 +91,7 @@ func buildYearOfLastObs() Dimension {
 	result.MinValue = 1915
 	result.MaxValue = 2015
 	result.GridSize = 101
+	result.StepSize = 1.0
 	result.Extractor = &YearOfLastObsExtractor{1915}
 
 	return result
@@ -97,8 +102,9 @@ func buildOrbitalEccentricity() Dimension {
 
 	result.Name = "Orbital-Eccentricity"
 	result.MinValue = 0
-	result.MaxValue = 100
+	result.MaxValue = 1
 	result.GridSize = 100
+	result.StepSize = 0.01
 	result.Extractor = &OrbitalEccentricityExtractor{}
 
 	return result
@@ -111,6 +117,7 @@ func buildInclinationToTheEcliptic() Dimension {
 	result.MinValue = 0
 	result.MaxValue = 180
 	result.GridSize = 90
+	result.StepSize = 2.0
 	result.Extractor = &InclinationToTheEclipticExtractor{}
 
 	return result
@@ -123,7 +130,7 @@ func buildSemiMajorAxis() Dimension {
 	result.MinValue = 0
 	result.MaxValue = 10
 	result.GridSize = 100
-
+	result.StepSize = 0.1
 	result.Extractor = &SemimajorAxisExtractor{10, 10.0}
 
 	return result
@@ -136,8 +143,9 @@ func buildAbsoluteMagnitude() Dimension {
 	result.MinValue = -2
 	result.MaxValue = 28
 	result.GridSize = 60
+	result.StepSize = 0.5
 
-	result.Extractor = &AbsoluteMagnitudeExtractor{28, 10.0, 1, 5}
+	result.Extractor = &AbsoluteMagnitudeExtractor{28, 10.0, 2, 5}
 	return result
 }
 
