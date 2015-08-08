@@ -116,14 +116,13 @@
           for ( var i = min; i < max; i = i + tick) {
 
             if (count % 10 === 0) {
-              var value = i;
-              if (scale > 0) {
-                value = Math.round(i * scale) / scale;
-              }
-              
               var entry = {};
-              entry.c = count;
-              entry.v = value;
+              entry.c = (count * 10) + 45;
+              entry.v = i;
+              if (scale > 0) {
+                entry.v = Math.round(i * scale) / scale;
+              }
+
               result.push(entry);
             }
             count = count + 1;
@@ -145,8 +144,8 @@
               "class":"horizontalGrid",
               "x1" : 35,
               "x2" : 45,
-              "y1" : function(d) { return (d.c * 10) + 45; },
-              "y2" : function(d) { return (d.c * 10) + 45; },
+              "y1" : function(d) { return height - d.c + 10; },
+              "y2" : function(d) { return height - d.c + 10; },
               "fill" : "black",
               "shape-rendering" : "crispEdges",
               "stroke" : "white",
@@ -156,7 +155,7 @@
           .attr("class", "ymark")
           .attr("text-anchor", "middle")
           .attr("x", 30)
-          .attr("y", function(d) { return (d.c * 10) + 47; })
+          .attr("y", function(d) { return height - d.c + 13 ; })
           .attr("font-family", "sans-serif")
           .attr("font-size", 10)
           .attr("stroke", "white")
@@ -170,10 +169,10 @@
         xaxis.enter().append("line")
           .attr({
               "class":"verticalGrid",
-              "x1" : function(d) { return (d.c * 10) + 45; },
-              "x2" : function(d) { return (d.c * 10) + 45; },
-              "y1" : 35,
-              "y2" : 45,
+              "x1" : function(d) { return d.c; },
+              "x2" : function(d) { return d.c; },
+              "y1" : height - 25,
+              "y2" : height - 35,
               "fill" : "black",
               "shape-rendering" : "crispEdges",
               "stroke" : "white",
@@ -182,8 +181,8 @@
         xaxis.enter().append("text")
           .attr("class", "xmark")
           .attr("text-anchor", "middle")
-          .attr("x", function(d) { return (d.c * 10) + 45; })
-          .attr("y", 34)
+          .attr("x", function(d) { return d.c; })
+          .attr("y", height - 15)
           .attr("font-family", "sans-serif")
           .attr("font-size", 10)
           .attr("stroke", "white")
@@ -201,7 +200,7 @@
           .append("svg:rect")
           .attr("class", "rects")
           .attr("x", function(d) { return (d.x * 10) + 45; })
-          .attr("y", function(d) { return (d.y * 10) + 45; })
+          .attr("y", function(d) { return height - ((d.y * 10) + 45); })
           .attr("width", 10)
           .attr("height", 10)
           .attr("fill", function(d) { return mapColour(d.c);})
