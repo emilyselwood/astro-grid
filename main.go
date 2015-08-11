@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"syscall"
 
 	"github.com/wselwood/gompcreader"
 )
@@ -93,9 +94,9 @@ type drilldownMessage struct {
 	Value string
 }
 
-func processChannel(drillDownChannel chan drilldownMessage) {
+func processChannel(drillDownChannel chan drilldownMessage, maxFiles uint64) {
 	fileMap := make(map[string]*os.File)
-	maxHandles := 1000 / NumDimentions
+	maxHandles := (int(maxFiles) - 10) / NumDimentions // minus 10 to give us a bit of head room for other things.
 	for entry := range drillDownChannel {
 		file, ok := fileMap[entry.Path]
 		if !ok {
@@ -151,6 +152,18 @@ func main() {
 		}
 	}
 
+	// bump up our max file handles, Hopefully will make each channel have a bigger cache
+	var rLimit syscall.Rlimit
+	err = syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	if err != nil {
+		log.Fatal("Error Getting Rlimit ", err)
+	}
+
+	if rLimit.Cur < rLimit.Max {
+		rLimit.Cur = rLimit.Max
+		syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	}
+
 	mpcReader, err := gompcreader.NewMpcReader(*inputfile)
 	if err != nil {
 		log.Fatal("error creating mpcReader ", err)
@@ -167,7 +180,7 @@ func main() {
 	channels := make([]chan drilldownMessage, NumDimentions)
 	for i := range channels {
 		channels[i] = make(chan drilldownMessage, 10)
-		go processChannel(channels[i])
+		go processChannel(channels[i], rLimit.Cur)
 	}
 
 	result, err := mpcReader.ReadEntry()
