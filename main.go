@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -17,6 +18,7 @@ const gridSize int = int(maxDistance * 10)
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputDir = flag.String("out", "", "the output path to write the structure")
 var debugMode = flag.Bool("debug", false, "add flag if you want extra debug logging. This has a big performance impact.")
+var forceClean = flag.Bool("force", false, "force clean output directory if it contains data")
 
 func outputGrid(dimentions []Dimension, resultTable [][]Grid) {
 	for i := 0; i < NumDimentions; i++ {
@@ -82,7 +84,17 @@ func pathIsDir(path string) (bool, error) {
 	} else if err != nil {
 		return false, err
 	}
+
 	return pathStat.IsDir(), err
+}
+
+func dirContainsFiles(path string) (bool, error) {
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return false, err
+	}
+
+	return len(files) > 0, nil
 }
 
 func main() {
@@ -102,6 +114,18 @@ func main() {
 		log.Fatal("Could not check output path existance")
 	} else if !exists {
 		log.Fatal("Output path does not exist or is not a directory")
+	}
+
+	hasFiles, err := dirContainsFiles(*outputDir)
+	if err != nil {
+		log.Fatal("Could not check dir contence")
+	} else if hasFiles {
+		if !(*forceClean) {
+			log.Fatal("output directory is not empty. Refusing to overwrite data. Use -force or delete all files and folders in output path manually")
+		} else {
+			os.RemoveAll(*outputDir)
+			createPathIfNeeded(*outputDir)
+		}
 	}
 
 	mpcReader, err := gompcreader.NewMpcReader(*inputfile)

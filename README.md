@@ -41,4 +41,4 @@ and how to find the base value for that cell. Tests are in `extractors_test.go`
 ## Contributions ##
 
 All contributions are warmly welcomed. Please report bugs using the bug tracker the git hub project.
-Please fork, branch and raise pull requests when submitting code changes. Any questions or
+Please fork, branch and raise pull requests when submitting code changes. Any questions are probably a bug
