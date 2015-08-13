@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/wselwood/gompcreader"
@@ -61,10 +63,6 @@ func outputGrid(dimentions []Dimension, resultTable [][]Grid) {
 	}
 }
 
-func createPathIfNeeded(path string) {
-	os.MkdirAll(path, 0777)
-}
-
 func openOrCreateFile(path string) (*os.File, error) {
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
 }
@@ -87,38 +85,6 @@ func dirContainsFiles(path string) (bool, error) {
 	}
 
 	return len(files) > 0, nil
-}
-
-type drilldownMessage struct {
-	Path  string
-	Value string
-}
-
-func processChannel(drillDownChannel chan drilldownMessage, maxFiles uint64) {
-	fileMap := make(map[string]*os.File)
-	maxHandles := (int(maxFiles) - 10) / NumDimentions // minus 10 to give us a bit of head room for other things.
-	for entry := range drillDownChannel {
-		file, ok := fileMap[entry.Path]
-		if !ok {
-			if len(fileMap) > maxHandles {
-				for p, f := range fileMap {
-					f.Close()
-					delete(fileMap, p)
-				}
-			}
-
-			file, err := openOrCreateFile(entry.Path)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fileMap[entry.Path] = file
-		}
-		fmt.Fprintln(file, entry.Value)
-	}
-	close(drillDownChannel)
-	for _, f := range fileMap {
-		f.Close()
-	}
 }
 
 func main() {
@@ -148,7 +114,7 @@ func main() {
 			log.Fatal("Output directory is not empty. Refusing to overwrite data. Use -force or delete all files and folders in output path manually")
 		} else {
 			os.RemoveAll(*outputDir)
-			createPathIfNeeded(*outputDir)
+			os.MkdirAll(*outputDir, 0777)
 		}
 	}
 
@@ -174,14 +140,9 @@ func main() {
 	var resultTable = BuildResultsGrid(dimentions[:])
 
 	var count int64
+	var flushCount int64
 
-	//var resultTable = newGrid()
-
-	channels := make([]chan drilldownMessage, NumDimentions)
-	for i := range channels {
-		channels[i] = make(chan drilldownMessage, 10)
-		go processChannel(channels[i], rLimit.Cur)
-	}
+	drilldowns := make(map[string]string)
 
 	result, err := mpcReader.ReadEntry()
 	for err == nil {
@@ -198,21 +159,42 @@ func main() {
 						}
 						grid[x][y].Count = grid[x][y].Count + 1
 
-						drillDownPath := fmt.Sprintf("%s/%s/%s/%d", *outputDir, dimentions[i].Name, dimentions[j].Name, x)
 						if grid[x][y].X == 0 {
 							grid[x][y].X = int(x)
 							grid[x][y].Y = int(y)
 							grid[x][y].StartX = dimentions[i].Extractor.Extract(result)
 							grid[x][y].StartY = dimentions[j].Extractor.Extract(result)
-
-							createPathIfNeeded(drillDownPath)
 						}
-
-						drillDownPath = fmt.Sprintf("%s/%d.txt", drillDownPath, y)
-						channels[i] <- drilldownMessage{drillDownPath, result.ID}
+						drillDownPath := fmt.Sprintf("%s/%s/%s/%d/%d.txt", *outputDir, dimentions[i].Name, dimentions[j].Name, x, y)
+						v, k := drilldowns[drillDownPath]
+						if !k {
+							v = "id\n"
+						}
+						drilldowns[drillDownPath] = v + result.ID + "\n"
 
 					}
 				}
+			}
+		}
+
+		// flush what we have so far to keep our memory useage to a reasonable level.
+		if count%10000 == 0 {
+			flushCount = flushCount + 1
+			for k, v := range drilldowns {
+				// only try and create the folders if we know it is new.
+				if strings.HasPrefix(v, "id\n") {
+					os.MkdirAll(filepath.Dir(k), 0777)
+				}
+
+				f, err := openOrCreateFile(k)
+				if err != nil {
+					log.Fatal(err)
+				}
+				f.WriteString(strings.TrimRight(v, "\n"))
+				f.Close()
+
+				// trim back to just a new line, Don't want to keep putting id in the top of the file.
+				drilldowns[k] = "\n"
 			}
 		}
 
@@ -224,6 +206,21 @@ func main() {
 		log.Fatal(fmt.Sprintf("error reading line %d\n", count), err)
 	}
 
+	for k, v := range drilldowns {
+		if v != "\n" {
+			os.MkdirAll(filepath.Dir(k), 0777)
+			f, err := openOrCreateFile(k)
+			if err != nil {
+				log.Fatal(err)
+			}
+			f.WriteString(v)
+			f.Close()
+		}
+		delete(drilldowns, k)
+	}
+
 	outputGrid(dimentions[:], resultTable)
 	RenderDimensions(*outputDir, dimentions[:])
+
+	fmt.Printf("processed: %d flushes: %d\n", count, flushCount)
 }
