@@ -199,12 +199,27 @@
         rectangles.enter()
           .append("svg:rect")
           .attr("class", "rects")
+          .attr("id", function(d) { return "rects_" + d.x + "_" + d.y})
           .attr("x", function(d) { return (d.x * 10) + 45; })
           .attr("y", function(d) { return height - ((d.y * 10) + 45); })
           .attr("width", 10)
           .attr("height", 10)
           .attr("fill", function(d) { return mapColour(d.c);})
           .attr("stroke", "dark gray")
+          .on("click", function(d) {
+            var path = "data/" + xAxisName + "/" + yAxisName + "/" + d.x + "/" + d.y + ".txt";
+            d3.csv(path, function(error, csvData) {
+              var links = d3.select("#links").selectAll("drilldown").data(csvData);
+              links.remove();
+              links.enter()
+                .append("a")
+                .attr("class", "drilldown")
+                .attr("target", "_blank")
+                .attr("href", function(d) { return "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id; })
+                .text(function(d) { return d.id; })
+                .append("br");
+            })
+          })
           .append("svg:title")
           .text(function(d) {
             return xAxisName + ": " + d.sx + " " + yAxisName + ": " + d.sy + " Count: " +d.c;
