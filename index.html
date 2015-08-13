@@ -215,7 +215,7 @@
                 .append("a")
                 .attr("class", "drilldown")
                 .attr("target", "_blank")
-                .attr("href", function(d) { return "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + d.id; })
+                .attr("href", function(d) { return "http://minorplanetcenter.net/db_search/show_object?object_id=" + d.id; })
                 .text(function(d) { return d.id; })
                 .append("br");
             })
