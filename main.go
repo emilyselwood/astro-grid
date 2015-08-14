@@ -15,9 +15,6 @@ import (
 	"github.com/wselwood/gompcreader"
 )
 
-const maxDistance = 6.0
-const gridSize int = int(maxDistance * 10)
-
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputDir = flag.String("out", "", "the output path to write the structure")
 var debugMode = flag.Bool("debug", false, "add flag if you want extra debug logging. This has a big performance impact.")
