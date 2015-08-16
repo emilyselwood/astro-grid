@@ -138,11 +138,11 @@ func TestOrbitalEccentricityExtractor(t *testing.T) {
 
 //InclinationToTheEclipticExtractor
 var inclinationTestCases = []floatTestCase{
-	{12.0, "12.0", 6},
-	{45.4, "44.0", 22},
-	{45.6, "44.0", 22},
-	{44.4, "44.0", 22},
-	{43.6, "42.0", 21},
+	{12.0, "12.0", 12},
+	{45.4, "45.0", 45},
+	{45.6, "45.0", 45},
+	{44.4, "44.0", 44},
+	{43.6, "43.0", 43},
 }
 
 func TestInclinationToTheEclipticExtractor(t *testing.T) {

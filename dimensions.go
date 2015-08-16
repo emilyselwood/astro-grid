@@ -77,7 +77,7 @@ func buildYearOfFirstObs() Dimension {
 	result.Name = "Year-Of-First-Obs"
 	result.MinValue = 1915
 	result.MaxValue = 2015
-	result.GridSize = 100
+	result.GridSize = 101
 	result.StepSize = 1.0
 	result.Extractor = &YearOfFirstObsExtractor{1915}
 
@@ -115,9 +115,9 @@ func buildInclinationToTheEcliptic() Dimension {
 
 	result.Name = "Inclination-To-The-Ecliptic"
 	result.MinValue = 0
-	result.MaxValue = 180
+	result.MaxValue = 90
 	result.GridSize = 90
-	result.StepSize = 2.0
+	result.StepSize = 1.0
 	result.Extractor = &InclinationToTheEclipticExtractor{}
 
 	return result

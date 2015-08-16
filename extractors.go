@@ -147,14 +147,17 @@ type InclinationToTheEclipticExtractor struct {
 ExtractCell for the InclinationToTheEcliptic
 */
 func (extractor *InclinationToTheEclipticExtractor) ExtractCell(in *gompcreader.MinorPlanet) int32 {
-	return int32(in.InclinationToTheEcliptic / 2)
+	if in.InclinationToTheEcliptic >= 90.0 {
+		return -1
+	}
+	return int32(in.InclinationToTheEcliptic)
 }
 
 /*
 Extract the InclinationToTheEcliptic
 */
 func (extractor *InclinationToTheEclipticExtractor) Extract(in *gompcreader.MinorPlanet) string {
-	return fmt.Sprintf("%3.1f", float64(int64(in.InclinationToTheEcliptic/2))*2)
+	return fmt.Sprintf("%3.1f", float64(int(in.InclinationToTheEcliptic)))
 }
 
 /*
