@@ -25,6 +25,11 @@
 
     #links {
       float:right;
+      color:aqua;
+    }
+
+    #links a {
+      color:aqua;
     }
 
     .footer {
@@ -59,16 +64,47 @@
 
   <script>
 
-  function decimalPlaces(number) {
-    // toFixed produces a fixed representation accurate to 20 decimal places
-    // without an exponent.
-    // The ^-?\d*\. strips off any sign, integer portion, and decimal point
-    // leaving only the decimal fraction.
-    // The 0+$ strips off any trailing zeroes.
-    return ((+number).toFixed(10)).replace(/^-?\d*\.?|0+$/g, '').length;
-  }
+    function decimalPlaces(number) {
+      // toFixed produces a fixed representation accurate to 20 decimal places
+      // without an exponent.
+      // The ^-?\d*\. strips off any sign, integer portion, and decimal point
+      // leaving only the decimal fraction.
+      // The 0+$ strips off any trailing zeroes.
+      return ((+number).toFixed(10)).replace(/^-?\d*\.?|0+$/g, '').length;
+    };
+
+    var onCellClick = function(xAxisName, yAxisName, x, y, colourValue) {
+      var path = "data/" + xAxisName + "/" + yAxisName + "/" + x + "/" + y + ".txt";
+      window.location.hash = xAxisName + "/" + yAxisName + "/" + colourValue + "/" + x + "/" + y;
+      d3.csv(path, function(csvData) {
+        var links = d3.select("#links").selectAll(".drill").data(csvData);
+
+        links.enter()
+          .append("a")
+          .attr("class", "drill")
+          .attr("target", "_blank")
+          .attr("href", function(d) {
+            return "http://minorplanetcenter.net/db_search/show_object?object_id=" + d.id;
+          })
+          .text(function(d) { return d.id; })
+          .append("br");
+
+        links.attr("class", "drill")
+          .attr("target", "_blank")
+          .attr("href", function(d) {
+            return "http://minorplanetcenter.net/db_search/show_object?object_id=" + d.id;
+          })
+          .text(function(d) { return d.id; })
+          .append("br");
+
+        links.exit().remove();
+      })
+    };
 
     var onAxisChange = function() {
+
+      d3.select("#links").selectAll(".drill").remove();
+
       var xSelect = document.getElementById("xAxisSelect");
       var ySelect = document.getElementById("yAxisSelect");
       var colourSelect = document.getElementById("colourSelect");
@@ -199,12 +235,16 @@
         rectangles.enter()
           .append("svg:rect")
           .attr("class", "rects")
+          .attr("id", function(d) { return "rects_" + d.x + "_" + d.y})
           .attr("x", function(d) { return (d.x * 10) + 45; })
           .attr("y", function(d) { return height - ((d.y * 10) + 45); })
           .attr("width", 10)
           .attr("height", 10)
           .attr("fill", function(d) { return mapColour(d.c);})
           .attr("stroke", "dark gray")
+          .on("click", function(d) {
+            onCellClick(xAxisName, yAxisName, d.x, d.y, colourValue)
+          })
           .append("svg:title")
           .text(function(d) {
             return xAxisName + ": " + d.sx + " " + yAxisName + ": " + d.sy + " Count: " +d.c;
@@ -242,9 +282,14 @@
           if (parts[2]) {
             document.getElementById('colourSelect').value = parts[2]
           }
+          onAxisChange();
+          if (parts[3] && parts[4]) {
+            onCellClick(parts[0].substring(1), parts[1], parts[3], parts[4], parts[2])
+          }
         }
+      } else {
+        onAxisChange();
       }
-      onAxisChange();
     });
   </script>
 </body>
