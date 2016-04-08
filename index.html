@@ -4,10 +4,13 @@
   <title>astro-grid</title>
   <meta charset="UTF-8">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.0.0/intro.min.js" charset="utf-8"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.0.0/introjs.min.css" rel="stylesheet" ></style>
+
   <style type="text/css">
     body {
       background-color: black;
-      color:white;
     }
     #header {
       color: white;
@@ -17,10 +20,19 @@
       width: 100%;
     }
 
+    #help {
+      color: white;
+      float: right;
+      font-family: sans-serif;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
     #display {
       width:650;
       height:650;
       float:left;
+      color:white;
     }
 
     #links {
@@ -41,20 +53,21 @@
   </style>
 </head>
 <body>
-  <div id="header">
-    X:<select id="xAxisSelect" name="xAxisSelect"></select>
-    Y:<select id="yAxisSelect" name="yAxisSelect"></select>
-    Colour:<select id="colourSelect" name="colourSelect">
+  <div id="header"  data-step="1" data-intro="Welcome to astro grid. This is a system for visulising the known minor planets">
+    X:<select id="xAxisSelect" name="xAxisSelect" data-step="2" data-intro="Select an attribute to use as the X axis"></select>
+    Y:<select id="yAxisSelect" name="yAxisSelect" data-step="3" data-intro="Select an attribute to use as the Y axis<br> Pick a different attribute to the X axis or you will just get a line"></select>
+    Colour:<select id="colourSelect" name="colourSelect" data-step="4" data-intro="Pick the colour to use for the grid. Some people find different colours easier to see.">
       <option value="red">Red</option>
       <option value="green" default="true">Green</option>
       <option value="blue">Blue</option>
       <option value="gray">Gray</option>
     </select>
+    <span id="help" onclick="javascript:introJs().start();">?</span>
   </div>
   <div id="body">
-    <div id="display">
+    <div id="display" data-step="5" data-position="right" data-intro="The data grid will be displaied here. Brighter colours mean there are more asteroids in that region">
     </div>
-    <div id="links">
+    <div id="links" data-step="6" data-intro="If you select a square on the grid a list of asteroids in that square will appear here. You can click on them to find out more information">
     </div>
   </div>
   <div class="footer">
@@ -291,6 +304,13 @@
         onAxisChange();
       }
     });
+
+
+  </script>
+  <script>
+  if (!window.location.hash) {
+    introJs().start();
+  }
   </script>
 </body>
 </html>
