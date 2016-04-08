@@ -74,7 +74,11 @@
     Data created from <a href="http://minorplanetcenter.net/">Minor Planet Centre</a> Orbit files. Avaible <a href="http://minorplanetcenter.net/iau/MPCORB.html">here</a><br>
     Processed by Wil Selwood using code avaible on <a href="https://github.com/wselwood/astro-grid">github</a>
   </div>
-
+  <script>
+  if (!window.location.hash) {
+    introJs().start();
+  }
+  </script>
   <script>
 
     function decimalPlaces(number) {
@@ -307,10 +311,6 @@
 
 
   </script>
-  <script>
-  if (!window.location.hash) {
-    introJs().start();
-  }
-  </script>
+
 </body>
 </html>
